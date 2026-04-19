@@ -1,0 +1,30 @@
+{
+  "tasks": {
+    "start": "deno run -A --watch server.ts",
+    "generate-client": "deno run -A npm:openapi-typescript http://localhost:9080/openapi -o services/api-schema.d.ts"
+  },
+  "imports": {
+    "react": "npm:react@18.2.0",
+    "react-dom/": "npm:react-dom@18.2.0/",
+    "@reduxjs/toolkit": "npm:@reduxjs/toolkit@2",
+    "react-redux": "npm:react-redux@9",
+    "openapi-fetch": "npm:openapi-fetch@0.9",
+    "@mui/material": "npm:@mui/material@5.15.0",
+    "@mui/icons-material/": "npm:@mui/icons-material@5.15.0/",
+    "@emotion/react": "npm:@emotion/react@11.11.3",
+    "@emotion/styled": "npm:@emotion/styled@11.11.0",
+    "@mui/x-data-grid": "npm:@mui/x-data-grid@6.18.4",
+    "react-financial-charts": "npm:react-financial-charts@2.0.1",
+    "d3-format": "npm:d3-format@3",
+    "d3-time-format": "npm:d3-time-format@4"
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable",
+      "deno.ns"
+    ],
+    "jsx": "react-jsx"
+  }
+}
