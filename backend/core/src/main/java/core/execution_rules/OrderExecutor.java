@@ -6,6 +6,13 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 /**
  * Handles execution logic for various order types (market, limit, stop).
@@ -13,9 +20,17 @@ import jakarta.ws.rs.core.Response;
 @Path("/execute")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "Execution")
 public class OrderExecutor {
     @POST
-    public Response executeOrder(ExecutionRequest request) {
+    @Operation(summary = "Evaluate and execute an order according to execution policy")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Execution evaluated.",
+                    content = @Content(schema = @Schema(implementation = ExecutionResult.class))),
+            @APIResponse(responseCode = "400", description = "Invalid execution request.",
+                    content = @Content(schema = @Schema(implementation = ExecutionResult.class)))
+    })
+    public Response executeOrder(@RequestBody(required = true, description = "Execution request payload") ExecutionRequest request) {
         if (request == null) {
             return badRequest("Execution request is required.");
         }
@@ -146,6 +161,7 @@ public class OrderExecutor {
         return Math.round(value * 100_000.0d) / 100_000.0d;
     }
 
+    @Schema(name = "ExecutionRequest", description = "Execution policy evaluation request.")
     public static class ExecutionRequest {
         private String orderId;
         private String symbol;
@@ -230,6 +246,7 @@ public class OrderExecutor {
         }
     }
 
+    @Schema(name = "ExecutionResult", description = "Execution outcome after applying configured rules.")
     public static class ExecutionResult {
         private String orderId;
         private String status;

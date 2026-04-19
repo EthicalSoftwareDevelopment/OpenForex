@@ -6,6 +6,13 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 /**
  * Performs leverage and margin calculations for trading mechanics.
@@ -13,12 +20,20 @@ import jakarta.ws.rs.core.Response;
 @Path("/leverage")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "Leverage")
 public class LeverageCalculator {
     private static final double DEFAULT_ENTRY_PRICE = 1.0d;
     private static final double DEFAULT_MAX_ALLOWED_LEVERAGE = 10.0d;
 
     @POST
-    public Response calculateLeverage(LeverageRequest request) {
+    @Operation(summary = "Calculate leverage, margin, and free margin")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Leverage metrics calculated.",
+                    content = @Content(schema = @Schema(implementation = LeverageResult.class))),
+            @APIResponse(responseCode = "400", description = "Invalid leverage request.",
+                    content = @Content(schema = @Schema(implementation = LeverageResult.class)))
+    })
+    public Response calculateLeverage(@RequestBody(required = true, description = "Leverage calculation payload") LeverageRequest request) {
         if (request == null) {
             return badRequest("Leverage request is required.");
         }
@@ -79,6 +94,7 @@ public class LeverageCalculator {
         return Math.round(value * 100_000.0d) / 100_000.0d;
     }
 
+    @Schema(name = "LeverageRequest", description = "Position and balance inputs used for leverage and margin calculations.")
     public static class LeverageRequest {
         private double positionSize;
         private double accountBalance;
@@ -118,6 +134,7 @@ public class LeverageCalculator {
         }
     }
 
+    @Schema(name = "LeverageResult", description = "Calculated leverage, margin, and risk-limit state.")
     public static class LeverageResult {
         private double notionalValue;
         private double leverageRatio;

@@ -7,6 +7,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.time.Instant;
 import java.util.Map;
@@ -17,13 +24,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Path("/price-feed")
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "Price Feed")
 public class RealTimePriceFeed {
     private final Map<String, PriceTick> latestTicks = new ConcurrentHashMap<>();
 
     @GET
-    public Response getPriceTick(@QueryParam("symbol") String symbol,
-                                 @DefaultValue("synthetic") @QueryParam("source") String source,
-                                 @DefaultValue("1000") @QueryParam("frequencyMs") long frequencyMs) {
+    @Operation(summary = "Get the latest synthetic price tick")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Price tick returned.",
+                    content = @Content(schema = @Schema(implementation = PriceTick.class))),
+            @APIResponse(responseCode = "400", description = "Invalid request parameters.",
+                    content = @Content(schema = @Schema(implementation = PriceTick.class)))
+    })
+    public Response getPriceTick(@Parameter(description = "Instrument symbol, for example EURUSD") @QueryParam("symbol") String symbol,
+                                 @Parameter(description = "Feed source label") @DefaultValue("synthetic") @QueryParam("source") String source,
+                                 @Parameter(description = "Synthetic tick generation frequency in milliseconds") @DefaultValue("1000") @QueryParam("frequencyMs") long frequencyMs) {
         if (isBlank(symbol)) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new PriceTick(null, source, frequencyMs, 0.0d, 0.0d, 0.0d, null,
@@ -67,6 +82,7 @@ public class RealTimePriceFeed {
         return Math.round(value * 100_000.0d) / 100_000.0d;
     }
 
+    @Schema(name = "PriceTick", description = "Latest synthetic or live price feed tick.")
     public static class PriceTick {
         private String symbol;
         private String source;

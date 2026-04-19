@@ -8,6 +8,16 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +30,24 @@ import java.util.concurrent.ConcurrentHashMap;
 @Path("/orders")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "Order Matching")
 public class OrderMatcher {
     private final OrderQueue orderQueue = new OrderQueue();
     private final Map<String, MatchResult> matchResults = new ConcurrentHashMap<>();
 
     @POST
-    public Response submitOrder(OrderRequest request) {
+    @Counted(name = "orders_submitted_total", description = "Total number of order submissions received by the matching engine.", absolute = true)
+    @Timed(name = "orders_submit_time", description = "Time spent processing order submissions.", absolute = true)
+    @Operation(summary = "Submit an order for matching", description = "Validates the incoming order, attempts to cross the book, and returns the resulting match state.")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Order matched immediately, partially, or rejected after immediate evaluation.",
+                    content = @Content(schema = @Schema(implementation = MatchResult.class))),
+            @APIResponse(responseCode = "202", description = "Order accepted and placed on the order book.",
+                    content = @Content(schema = @Schema(implementation = MatchResult.class))),
+            @APIResponse(responseCode = "400", description = "Invalid order request.",
+                    content = @Content(schema = @Schema(implementation = MatchResult.class)))
+    })
+    public Response submitOrder(@RequestBody(required = true, description = "Order submission payload") OrderRequest request) {
         if (request == null) {
             return badRequest("Order request is required.");
         }
@@ -117,14 +139,29 @@ public class OrderMatcher {
                 statusMessage(status));
 
         matchResults.put(request.getOrderId(), result);
-        return Response.status(matchedQuantity > 0 ? Response.Status.OK : Response.Status.ACCEPTED)
+
+        Response.Status httpStatus = switch (status) {
+            case "PENDING" -> Response.Status.ACCEPTED;
+            case "MATCHED", "PARTIAL", "REJECTED" -> Response.Status.OK;
+            default -> Response.Status.OK;
+        };
+
+        return Response.status(httpStatus)
                 .entity(result)
                 .build();
     }
 
     @GET
     @Path("/{orderId}")
-    public Response getMatchStatus(@PathParam("orderId") String orderId) {
+    @Counted(name = "order_status_requests_total", description = "Total number of order status lookups.", absolute = true)
+    @Operation(summary = "Fetch the current match status for an order")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Known order status.",
+                    content = @Content(schema = @Schema(implementation = MatchResult.class))),
+            @APIResponse(responseCode = "404", description = "No matching order status was found.",
+                    content = @Content(schema = @Schema(implementation = MatchResult.class)))
+    })
+    public Response getMatchStatus(@Parameter(description = "Order identifier to inspect") @PathParam("orderId") String orderId) {
         MatchResult result = matchResults.get(orderId);
         if (result == null) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -167,6 +204,9 @@ public class OrderMatcher {
         if (!"MARKET".equals(orderType) && !"LIMIT".equals(orderType) && !"STOP".equals(orderType)) {
             return "orderType must be MARKET, LIMIT, or STOP.";
         }
+        if ("STOP".equals(orderType)) {
+            return "STOP orders are not supported by the order matching engine; submit triggered orders as MARKET or LIMIT.";
+        }
         if (request.getQuantity() <= 0) {
             return "quantity must be greater than zero.";
         }
@@ -198,6 +238,7 @@ public class OrderMatcher {
         };
     }
 
+    @Schema(name = "OrderRequest", description = "Order payload submitted to the matching engine.")
     public static class OrderRequest {
         private String orderId;
         private String symbol;
@@ -255,6 +296,7 @@ public class OrderMatcher {
         }
     }
 
+    @Schema(name = "OrderMatchResult", description = "Current outcome of order matching for a submitted order.")
     public static class MatchResult {
         private String orderId;
         private String symbol;

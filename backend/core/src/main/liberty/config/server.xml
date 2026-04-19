@@ -1,0 +1,19 @@
+<server description="OpenForex Core Open Liberty server">
+    <featureManager>
+        <feature>restfulWS-3.1</feature>
+        <feature>mpOpenAPI-4.0</feature>
+        <feature>mpHealth-4.0</feature>
+        <feature>mpMetrics-5.1</feature>
+        <feature>jsonb-3.0</feature>
+        <feature>jsonp-2.1</feature>
+        <feature>cdi-4.0</feature>
+    </featureManager>
+
+    <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9081" httpsPort="9444" />
+
+    <mpHealth authentication="false" />
+    <mpMetrics authentication="false" />
+
+    <applicationManager autoExpand="true" />
+</server>
+

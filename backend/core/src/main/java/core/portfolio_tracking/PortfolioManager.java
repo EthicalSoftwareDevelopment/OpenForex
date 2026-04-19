@@ -9,6 +9,14 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,18 +28,31 @@ import java.util.concurrent.ConcurrentHashMap;
 @Path("/portfolio")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "Portfolio")
 public class PortfolioManager {
     private final Map<String, AccountState> accounts = new ConcurrentHashMap<>();
 
     @GET
-    public Response getPortfolio(@DefaultValue("default") @QueryParam("accountId") String accountId) {
+    @Operation(summary = "Get the current portfolio snapshot for an account")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Portfolio state returned.",
+                    content = @Content(schema = @Schema(implementation = PortfolioSnapshot.class)))
+    })
+    public Response getPortfolio(@Parameter(description = "Account identifier to inspect") @DefaultValue("default") @QueryParam("accountId") String accountId) {
         String normalizedAccountId = normalizeAccountId(accountId);
         return Response.ok(toSnapshot(normalizedAccountId, stateFor(normalizedAccountId))).build();
     }
 
     @POST
     @Path("/update")
-    public Response updatePortfolio(PortfolioUpdateRequest request) {
+    @Operation(summary = "Apply a portfolio cash or trade update")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Portfolio updated.",
+                    content = @Content(schema = @Schema(implementation = PortfolioSnapshot.class))),
+            @APIResponse(responseCode = "400", description = "Invalid portfolio update request.",
+                    content = @Content(schema = @Schema(implementation = PortfolioSnapshot.class)))
+    })
+    public Response updatePortfolio(@RequestBody(required = true, description = "Portfolio trade or cash update payload") PortfolioUpdateRequest request) {
         if (request == null) {
             return badRequest("Portfolio update request is required.");
         }
@@ -131,6 +152,7 @@ public class PortfolioManager {
         return Math.round(value * 100_000.0d) / 100_000.0d;
     }
 
+    @Schema(name = "PortfolioUpdateRequest", description = "Trade or cash adjustment applied to a portfolio.")
     public static class PortfolioUpdateRequest {
         private String accountId;
         private String symbol;
@@ -188,6 +210,7 @@ public class PortfolioManager {
         }
     }
 
+    @Schema(name = "PortfolioSnapshot", description = "Current portfolio state, exposures, and message.")
     public static class PortfolioSnapshot {
         private String accountId;
         private double cashBalance;

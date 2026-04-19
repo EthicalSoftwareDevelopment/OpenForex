@@ -6,7 +6,7 @@
     <groupId>openforex</groupId>
     <artifactId>core</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -15,6 +15,11 @@
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <jakarta.ws.rs.version>4.0.0</jakarta.ws.rs.version>
         <jersey.version>3.1.6</jersey.version>
+        <swagger.version>2.2.15</swagger.version>
+        <microprofile.openapi.version>4.0.2</microprofile.openapi.version>
+        <microprofile.health.version>4.0</microprofile.health.version>
+        <microprofile.metrics.version>5.1.2</microprofile.metrics.version>
+        <liberty.maven.plugin.version>3.11.4</liberty.maven.plugin.version>
     </properties>
 
     <dependencies>
@@ -22,6 +27,12 @@
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
             <version>${jakarta.ws.rs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -34,10 +45,124 @@
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Jersey server + Grizzly for embedded runtime -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- JSON support for Jersey (Jackson) -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <!-- Swagger/OpenAPI models used by the lightweight fallback generator -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.154</version>
+        </dependency>
+
+        <!-- MicroProfile OpenAPI annotations for the Open Liberty deployment path -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
+            <version>${microprofile.openapi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.health</groupId>
+            <artifactId>microprofile-health-api</artifactId>
+            <version>${microprofile.health.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.metrics</groupId>
+            <artifactId>microprofile-metrics-api</artifactId>
+            <version>${microprofile.metrics.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <warName>core</warName>
+                    <packagingExcludes>
+                        WEB-INF/lib/jersey-*.jar,
+                        WEB-INF/lib/grizzly-*.jar,
+                        WEB-INF/lib/hk2-*.jar,
+                        WEB-INF/lib/aopalliance-repackaged-*.jar,
+                        WEB-INF/lib/osgi-resource-locator-*.jar,
+                        WEB-INF/lib/javassist-*.jar,
+                        WEB-INF/lib/byte-buddy-*.jar,
+                        WEB-INF/lib/jackson-jaxrs-*.jar,
+                        WEB-INF/lib/jackson-module-jaxb-annotations-*.jar,
+                        WEB-INF/lib/jackson-module-jakarta-xmlbind-annotations-*.jar,
+                        WEB-INF/lib/jakarta.ws.rs-api-*.jar
+                    </packagingExcludes>
+                </configuration>
+            </plugin>
+            <!-- Build an executable embedded jar alongside the WAR for local Grizzly/Jersey runs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <executions>
+                    <execution>
+                        <id>embedded-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/embedded.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifest>
+                                    <mainClass>core.api.Main</mainClass>
+                                </manifest>
+                            </archive>
+                            <appendAssemblyId>true</appendAssemblyId>
+                            <finalName>${project.artifactId}-${project.version}</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -49,6 +174,16 @@
                 <version>3.2.5</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.openliberty.tools</groupId>
+                <artifactId>liberty-maven-plugin</artifactId>
+                <version>${liberty.maven.plugin.version}</version>
+                <configuration>
+                    <serverName>openforex-core</serverName>
+                    <serverXmlFile>src/main/liberty/config/server.xml</serverXmlFile>
+                    <looseApplication>true</looseApplication>
                 </configuration>
             </plugin>
         </plugins>

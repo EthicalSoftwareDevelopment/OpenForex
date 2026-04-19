@@ -56,5 +56,46 @@ class OrderMatcherTest {
         assertEquals(404, response.getStatus());
         assertEquals("UNKNOWN", result.getStatus());
     }
+
+    @Test
+    void rejectsUnmatchedMarketOrdersWithOkStatusAndRejectedPayload() {
+        OrderMatcher matcher = new OrderMatcher();
+
+        OrderMatcher.OrderRequest request = new OrderMatcher.OrderRequest();
+        request.setOrderId("market-1");
+        request.setSymbol("EURUSD");
+        request.setSide("BUY");
+        request.setOrderType("MARKET");
+        request.setQuantity(50_000d);
+
+        Response response = matcher.submitOrder(request);
+        OrderMatcher.MatchResult result = (OrderMatcher.MatchResult) response.getEntity();
+
+        assertEquals(200, response.getStatus());
+        assertEquals("REJECTED", result.getStatus());
+        assertFalse(result.isSuccessful());
+        assertEquals(0.0d, result.getMatchedQuantity());
+    }
+
+    @Test
+    void rejectsUnsupportedStopOrders() {
+        OrderMatcher matcher = new OrderMatcher();
+
+        OrderMatcher.OrderRequest request = new OrderMatcher.OrderRequest();
+        request.setOrderId("stop-1");
+        request.setSymbol("EURUSD");
+        request.setSide("BUY");
+        request.setOrderType("STOP");
+        request.setPrice(1.1050d);
+        request.setQuantity(10_000d);
+
+        Response response = matcher.submitOrder(request);
+        OrderMatcher.MatchResult result = (OrderMatcher.MatchResult) response.getEntity();
+
+        assertEquals(400, response.getStatus());
+        assertEquals("REJECTED", result.getStatus());
+        assertFalse(result.isSuccessful());
+        assertTrue(result.getMessage().contains("STOP orders are not supported"));
+    }
 }
 
