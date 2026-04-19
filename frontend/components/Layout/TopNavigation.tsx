@@ -10,10 +10,10 @@ import {
   Badge,
   Box,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import SecurityIcon from "@mui/icons-material/Security";
+import MenuIcon from "@mui/icons-material/Menu.js";
+import NotificationsIcon from "@mui/icons-material/Notifications.js";
+import AccountCircle from "@mui/icons-material/AccountCircle.js";
+import SecurityIcon from "@mui/icons-material/Security.js";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store.ts";
 

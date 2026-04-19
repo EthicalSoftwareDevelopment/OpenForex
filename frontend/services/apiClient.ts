@@ -8,7 +8,7 @@ import type { paths } from "./api-schema.d.ts";
  *
  * Notice that the baseUrl targets the standard React proxy address -> `/api`,
  * not the direct java backend port (`http://localhost:9080`).
- * The Deno edge server (`server.ts`) will securely intercept these calls and proxy them.
+ * The Deno edge server (`server.tsx`) will securely intercept these calls and proxy them.
  */
 export const apiClient = createClient<paths>({
   baseUrl: "/api",

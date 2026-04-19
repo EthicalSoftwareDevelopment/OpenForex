@@ -19,7 +19,7 @@ export interface Execution {
   timestamp: string;
 }
 
-interface TradingState {
+export interface TradingState {
   activeOrders: Order[];
   executions: Execution[];
   lastTradeError: string | null;

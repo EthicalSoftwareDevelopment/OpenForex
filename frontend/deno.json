@@ -1,17 +1,22 @@
 {
+  "nodeModulesDir": "auto",
   "tasks": {
-    "start": "deno run -A --watch server.ts",
+    "start": "deno run --no-check -A --watch server.tsx",
     "generate-client": "deno run -A npm:openapi-typescript http://localhost:9080/openapi -o services/api-schema.d.ts"
   },
   "imports": {
     "react": "npm:react@18.2.0",
+    "react-dom/client": "npm:react-dom@18.2.0/client",
+    "react-dom/server": "npm:react-dom@18.2.0/server",
     "react-dom/": "npm:react-dom@18.2.0/",
     "@reduxjs/toolkit": "npm:@reduxjs/toolkit@2",
     "react-redux": "npm:react-redux@9",
     "openapi-fetch": "npm:openapi-fetch@0.9",
+    "@emotion/cache": "npm:@emotion/cache@11.11.0",
     "@mui/material": "npm:@mui/material@5.15.0",
     "@mui/icons-material/": "npm:@mui/icons-material@5.15.0/",
     "@emotion/react": "npm:@emotion/react@11.11.3",
+    "@emotion/server/create-instance": "npm:@emotion/server@11.11.0/create-instance",
     "@emotion/styled": "npm:@emotion/styled@11.11.0",
     "@mui/x-data-grid": "npm:@mui/x-data-grid@6.18.4",
     "react-financial-charts": "npm:react-financial-charts@2.0.1",

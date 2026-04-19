@@ -3,8 +3,6 @@ import { ThemeProvider, createTheme, CssBaseline, Box, Toolbar, Typography } fro
 import { TopNavigation } from "./TopNavigation.tsx";
 import { LeftSidebar } from "./LeftSidebar.tsx";
 import { RightSidebar } from "./RightSidebar.tsx";
-import { Provider } from "react-redux";
-import { store } from "../../store/store.ts";
 
 // MUI Theme Config to act as baseline
 const theme = createTheme({
@@ -41,49 +39,47 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ display: "flex", minHeight: "100vh" }}>
 
-          {/* Main Top App Bar */}
-          <TopNavigation onMenuClick={toggleSidebar} onNotificationsClick={toggleRightSidebar} />
+        {/* Main Top App Bar */}
+        <TopNavigation onMenuClick={toggleSidebar} onNotificationsClick={toggleRightSidebar} />
 
-          {/* Left Navigation Menu */}
-          <LeftSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} isMobile={isMobile} />
+        {/* Left Navigation Menu */}
+        <LeftSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} isMobile={isMobile} />
 
-          {/* Right Intelligence Feed */}
-          <RightSidebar open={rightSidebarOpen} onClose={() => setRightSidebarOpen(false)} />
+        {/* Right Intelligence Feed */}
+        <RightSidebar open={rightSidebarOpen} onClose={() => setRightSidebarOpen(false)} />
 
-          {/* Main Content Area Container */}
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              bgcolor: "background.default",
-              p: 3,
-              transition: theme.transitions.create("margin", {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-              }),
-              marginLeft: isMobile || !sidebarOpen ? 0 : 0,
-            }}
-          >
-            {/* Toolbar filler required to push content down properly below the fixed App Bar */}
-            <Toolbar />
+        {/* Main Content Area Container */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: "background.default",
+            p: 3,
+            transition: theme.transitions.create("margin", {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
+            marginLeft: isMobile || !sidebarOpen ? 0 : 0,
+          }}
+        >
+          {/* Toolbar filler required to push content down properly below the fixed App Bar */}
+          <Toolbar />
 
-            {/* Application Page Routing Content Gets Injected Here */}
-            {children}
+          {/* Application Page Routing Content Gets Injected Here */}
+          {children}
 
-            {/* Phase 5: Legal Footer Stub */}
-            <Box mt={8} py={3} textAlign="center" borderTop="1px solid #333 text.secondary" color="#777">
-              <Typography variant="body2">© 2026 OpenForex Edge Layer.</Typography>
-              <Typography variant="caption">BaFin compliant architecture. Data synchronized via JVM core.</Typography>
-            </Box>
+          {/* Phase 5: Legal Footer Stub */}
+          <Box mt={8} py={3} textAlign="center" sx={{ borderTop: "1px solid", borderColor: "divider", color: "#777" }}>
+            <Typography variant="body2">© 2026 OpenForex Edge Layer.</Typography>
+            <Typography variant="caption">BaFin compliant architecture. Data synchronized via JVM core.</Typography>
           </Box>
         </Box>
-      </ThemeProvider>
-    </Provider>
+      </Box>
+    </ThemeProvider>
   );
 };
 

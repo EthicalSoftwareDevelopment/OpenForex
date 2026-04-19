@@ -2,6 +2,33 @@
 Enterprise‑grade simulator with a Java backend and React frontend, replicating live forex trading. Enables strategy validation, market insight, and risk‑free practice.
 
 
+## Windows Startup
+From `C:\Dev\OpenForex\installation`, PowerShell does **not** run scripts from the current directory unless you prefix them with `./` or `\.\`.
+
+Use one of these:
+
+```powershell
+Set-Location C:\Dev\OpenForex\installation
+.\start-all.ps1
+```
+
+Or use the Windows wrapper:
+
+```powershell
+Set-Location C:\Dev\OpenForex\installation
+cmd /c start-all.cmd
+```
+
+For backend-only startup:
+
+```powershell
+Set-Location C:\Dev\OpenForex\installation
+.\install-and-run-backend.ps1
+```
+
+If you want to run `start-all.ps1` without `\.\`, add `C:\Dev\OpenForex\installation` to your `PATH` or define a PowerShell alias/function in your profile.
+
+
 ## Forex Trading Simulator
 
 ## Overview

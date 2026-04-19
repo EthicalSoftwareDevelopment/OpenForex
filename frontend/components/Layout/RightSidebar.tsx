@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Drawer, Box, Typography, List, ListItem, ListItemText, Divider, IconButton, Paper } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import AnnouncementIcon from "@mui/icons-material/Announcement";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import CloseIcon from "@mui/icons-material/Close.js";
+import AnnouncementIcon from "@mui/icons-material/Announcement.js";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent.js";
 import { useMarketFeed } from "../../hooks/useMarketFeed.ts";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store.ts";

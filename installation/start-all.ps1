@@ -26,12 +26,12 @@ $FrontendPort = 8000
 try {
     $denoVersion = (deno --version 2>&1) -join " "
     if ($denoVersion -match "deno 2\.") {
-        Write-Host "✅ Deno 2.x Runtime Confirmed!" -ForegroundColor Green
+        Write-Host "[OK] Deno 2.x Runtime Confirmed" -ForegroundColor Green
     } else {
-        Write-Warning "⚠️ Deno 2.x is recommended for OpenForex, but found: $denoVersion"
+        Write-Warning "[WARN] Deno 2.x is recommended for OpenForex, but found: $denoVersion"
     }
 } catch {
-    Write-Error "❌ Deno is not installed or not in PATH! Please install Deno 2 (https://deno.land) and restart your console."
+    Write-Error "[ERROR] Deno is not installed or not in PATH. Please install Deno 2 (https://deno.land) and restart your console."
     exit 1
 }
 
@@ -50,8 +50,8 @@ Start-Process powershell.exe -ArgumentList "-NoExit -Command `"$FrontendCmd`"" -
 
 Write-Host "`nAll services have been dispatched to new windows!" -ForegroundColor Green
 Write-Host "----------------------------------------------------------" -ForegroundColor Cyan
-Write-Host " ☕ Backend (Java JVM): Booting on http://localhost:$BackendPort" -ForegroundColor White
-Write-Host " 🦕 Frontend (Deno)  : Booting on http://localhost:$FrontendPort" -ForegroundColor White
+Write-Host " Backend (Java JVM): Booting on http://localhost:$BackendPort" -ForegroundColor White
+Write-Host " Frontend (Deno 2) : Booting on http://localhost:$FrontendPort" -ForegroundColor White
 Write-Host "----------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "You can visit the frontend at: http://localhost:$FrontendPort" -ForegroundColor DarkCyan
 Write-Host "You can view the Java OpenAPI spec at: http://localhost:$BackendPort/openapi/ui/" -ForegroundColor DarkCyan

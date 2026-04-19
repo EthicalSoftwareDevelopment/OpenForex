@@ -18,7 +18,7 @@ export interface AuditLogEntry {
 export interface ComplianceAlert {
   id: string;
   timestamp: string;
-  severity: "WARNING" | "CRITICAL";
+  severity: "INFO" | "WARNING" | "CRITICAL";
   message: string;
   resolved: boolean;
 }
@@ -34,6 +34,9 @@ const complianceSlice = createSlice({
   name: "compliance",
   initialState,
   reducers: {
+    hydrateCompliance(state, action: PayloadAction<ComplianceState>) {
+      return action.payload;
+    },
     updateKycStatus(state, action: PayloadAction<ComplianceState["kycStatus"]>) {
       state.kycStatus = action.payload;
     },
@@ -58,6 +61,6 @@ const complianceSlice = createSlice({
   },
 });
 
-export const { updateKycStatus, updateAmlRisk, logAuditAction, triggerComplianceAlert, resolveComplianceAlert } = complianceSlice.actions;
+export const { hydrateCompliance, updateKycStatus, updateAmlRisk, logAuditAction, triggerComplianceAlert, resolveComplianceAlert } = complianceSlice.actions;
 export default complianceSlice.reducer;
 

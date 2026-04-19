@@ -3,6 +3,7 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Divider,
@@ -10,10 +11,10 @@ import {
   Typography,
   Box
 } from "@mui/material";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import PolicyIcon from "@mui/icons-material/Policy";
-import TimelineIcon from "@mui/icons-material/Timeline";
+import DashboardIcon from "@mui/icons-material/Dashboard.js";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp.js";
+import PolicyIcon from "@mui/icons-material/Policy.js";
+import TimelineIcon from "@mui/icons-material/Timeline.js";
 
 const drawerWidth = 240;
 
@@ -55,18 +56,22 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({ open, onClose, isMobil
         </Typography>
         <List>
           {menuItems.map((item) => (
-            <ListItem button key={item.label} sx={item.highlight ? { bgcolor: 'action.hover' } : {}}>
-              <ListItemIcon sx={item.highlight ? { color: 'primary.main' } : {}}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
+            <ListItem disablePadding key={item.label}>
+              <ListItemButton sx={item.highlight ? { bgcolor: 'action.hover' } : {}}>
+                <ListItemIcon sx={item.highlight ? { color: 'primary.main' } : {}}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
             </ListItem>
           ))}
         </List>
         <Divider />
         <List>
-          <ListItem button>
-            <ListItemText primary="Settings" />
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemText primary="Settings" />
+            </ListItemButton>
           </ListItem>
         </List>
       </Box>
