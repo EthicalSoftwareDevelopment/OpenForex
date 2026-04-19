@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "npm:@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface Position {
   id: string;

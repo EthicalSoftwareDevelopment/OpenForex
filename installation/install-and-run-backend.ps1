@@ -9,6 +9,12 @@ It cleans up old target builds, kills hanging Java processes to prevent file loc
 and launches the server with dynamic feature installation.
 #>
 
+param(
+    [string]$MavenProfile = "",
+    [int]$LibertyPort = 9081,
+    [switch]$Help
+)
+
 $ErrorActionPreference = 'Stop'
 
 Write-Host "==========================================================" -ForegroundColor Cyan
@@ -38,12 +44,6 @@ Start-Sleep -Seconds 2
 $BackendCoreDir = "..\backend\core"  # Change this if your directory structure is different
 # =======================================================================
 
-# ===================== SCRIPT PARAMETERS =====================
-param(
-    [string]$MavenProfile = "",
-    [int]$LibertyPort = 9081,
-    [switch]$Help
-)
 # ============================================================
 
 if ($Help -or $PSBoundParameters.ContainsKey('?')) {

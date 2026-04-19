@@ -1,4 +1,4 @@
-import { Middleware } from "npm:@reduxjs/toolkit";
+import { Middleware } from "@reduxjs/toolkit";
 
 const AUDIT_ENDPOINT = "/api/v1/bafin-audit"; // Point to the Deno Edge Proxy
 

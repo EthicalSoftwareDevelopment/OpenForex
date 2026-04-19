@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from "npm:@reduxjs/toolkit";
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { apiClient } from "../../services/apiClient.ts";
 
 export interface Order {
   id: string;
@@ -30,6 +31,43 @@ const initialState: TradingState = {
   lastTradeError: null,
 };
 
+export const submitTradeOrder = createAsyncThunk(
+  "trading/submitTradeOrder",
+  async (
+    payload: { instrument: string; type: "MARKET" | "LIMIT" | "STOP"; direction: "BUY" | "SELL"; quantity: number; price?: number },
+    { dispatch, rejectWithValue }
+  ) => {
+    try {
+      const { data, error } = await apiClient.POST("/v1/trading/orders", {
+        body: payload
+      });
+
+      if (error) {
+        dispatch(setTradeError(typeof error === "string" ? error : "API Rejected Order"));
+        return rejectWithValue(error);
+      }
+
+      // Optimistically record the order locally immediately after the gateway acknowledges it
+      const newOrder: Order = {
+        id: data.orderId,
+        instrument: payload.instrument,
+        type: payload.type,
+        direction: payload.direction,
+        quantity: payload.quantity,
+        price: payload.price || 0,
+        status: data.status,
+        timestamp: new Date().toISOString(),
+      };
+
+      dispatch(placeOrder(newOrder));
+      return data;
+    } catch (err: any) {
+      dispatch(setTradeError(err.message || "Network Fault"));
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 const tradingSlice = createSlice({
   name: "trading",
   initialState,
@@ -55,4 +93,3 @@ const tradingSlice = createSlice({
 
 export const { placeOrder, updateOrderStatus, recordExecution, setTradeError } = tradingSlice.actions;
 export default tradingSlice.reducer;
-

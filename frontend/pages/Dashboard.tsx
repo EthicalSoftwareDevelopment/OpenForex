@@ -33,6 +33,9 @@ export const DashboardPage: React.FC = () => {
         {/* Phase 3: Middle Section */}
         <TradingChartStub />
 
+        {/* Trading execution form connecting to Java Middleware */}
+        <QuickTradePanel />
+
         {/* Phase 3: Bottom Section */}
         <PositionsGrid />
       </Box>

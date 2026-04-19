@@ -1,4 +1,4 @@
-import { configureStore } from "npm:@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import portfolioReducer from "./slices/portfolioSlice.ts";
 import tradingReducer from "./slices/tradingSlice.ts";
 import complianceReducer from "./slices/complianceSlice.ts";
