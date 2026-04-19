@@ -2,6 +2,16 @@
 
 Purpose: Core trading mechanics (order matching, execution rules, portfolio tracking).
 
+## Submodule Descriptions
+
+- **Order Matching** (`order_matching`): Handles incoming orders, matches buy/sell requests, and manages order queues.
+- **Execution Rules** (`execution_rules`): Applies business logic and configuration to execute matched orders.
+- **Portfolio Tracking** (`portfolio_tracking`): Tracks user balances, open positions, and provides analytics and reporting.
+- **Volatility Modeling** (`volatility`): Computes volatility metrics for risk management and pricing.
+- **Historical Replay** (`simulation`): Simulates historical market data for backtesting strategies.
+- **Real-Time Price Feeds** (`feeds`): Ingests and processes live or synthetic market data.
+- **Leverage/Margin Calculations** (`calculations`): Calculates leverage and margin requirements for trades.
+
 ## Directory Structure
 
 - src/main/java/core/order_matching/OrderMatcher.java
@@ -24,14 +34,39 @@ Purpose: Core trading mechanics (order matching, execution rules, portfolio trac
 
 ## API Contracts
 
-- Order matching: Accepts order objects, returns match results.
-- Execution rules: Executes orders based on type and config.
-- Portfolio tracking: Tracks balances, positions, and analytics.
-- Volatility modeling: Computes and provides volatility metrics.
-- Historical replay: Simulates market data for backtesting.
-- Real-time price feeds: Ingests and processes live or synthetic data.
-- Leverage/margin: Calculates leverage and margin requirements.
+
+### Order Matching
+- **Input:** Order object (JSON or Java class)
+- **Output:** Match result (matched order details, status)
+
+### Execution Rules
+- **Input:** Order, execution config
+- **Output:** Execution result (filled, rejected, partial)
+
+### Portfolio Tracking
+- **Input:** Trade events, balance updates
+- **Output:** Portfolio state, analytics report
+
+### Volatility Modeling
+- **Input:** Price series, window size
+- **Output:** Volatility metrics (e.g., standard deviation)
+
+### Historical Replay
+- **Input:** Historical dataset, replay speed
+- **Output:** Simulated market events
+
+### Real-Time Price Feeds
+- **Input:** Feed source, frequency
+- **Output:** Price tick data
+
+### Leverage/Margin
+- **Input:** Position size, account balance
+- **Output:** Leverage ratio, margin requirement
 
 ## Notes
+
 - Implement as a Maven/Gradle submodule if splitting into independent deployables.
-- Use shared schemas for order, price, volatility, and replay data models.
+- Use shared schemas for order, price, volatility, and replay data models (see `../../shared/schemas`).
+- Ensure all modules are configurable via `config/application.properties` (e.g., volatility model, replay dataset, feed source).
+- Add unit tests for all modules, especially `portfolio_tracking` (PortfolioManager, Analytics).
+- Validate data models against shared schemas where applicable.

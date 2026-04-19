@@ -15,6 +15,8 @@ The OpenForex project will be developed in four phases: core trading mechanics a
 2. Develop historical replay mode.
 3. Create volatility modeling algorithms.
 4. Build trading mechanics (order types, leverage, portfolio tracking).
+5. Integrate Jakarta CDI for dependency injection.
+6. Implement Jakarta REST for API endpoints.
 
 **Tasks:**
 - Define data sources and frequency for real-time feeds.
@@ -23,6 +25,8 @@ The OpenForex project will be developed in four phases: core trading mechanics a
 - Specify execution rules for order types.
 - Develop leverage/margin calculation formulas.
 - Design portfolio tracking analytics and reporting.
+- Set up Jakarta CDI for dependency injection.
+- Create RESTful APIs using Jakarta REST for core functionalities.
 
 ---
 
